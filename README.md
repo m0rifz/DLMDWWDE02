@@ -22,17 +22,17 @@ Die Architektur basiert dabei aus Python-Skripten als auch Cloud-Services von Mi
 
 ## Verwendung des Repositorys: 
 
-**1. Repository herunterladen**
+### **1. Repository herunterladen**
 
 `git clone https://github.com/m0rifz/DLMDWWDE02.git DLMDWWDE02`
 
-**2. Umgebung aufbauen**
+### **2. Umgebung aufbauen**
 
 Bei **Ausführung mittels Docker** werden alle benötigten Komponenten beim Imagebau automatisch durch die mitgelieferte `requirements.txt` bereitgestellt und installiert.
 
 Bei **lokaler Ausführung** müssen die einzelenn Komponenten, welche in den Dateien `requirements.txt` der jeweiligen Schritte liegen, manuell installiert werden.
 
-**3. Bereitlegen der Umgebungsparametern**
+### **3. Bereitlegen der Umgebungsparametern**
 
 Zum Ausführen der `Collector.py` sind folgende Umgebungsparameter zu übergeben: 
 - RadiusInKm (`RADIUS`)
@@ -49,7 +49,7 @@ Zum Ausführen der `Cleaner.py` sind folgende Umgebungsparameter zu übergeben:
 - Azure Storage Blob Containername mit Rohdaten (`RAW_CONTAINER`)
 - Azure Storage Blob Containername mit bereigiten Daten (`CLEANED_CONTAINER`)
 
-**4. Ausführen der Datensammlung**
+### **4. Ausführen der Datensammlung**
 
 Docker-Image erstellen: 
 
@@ -64,7 +64,7 @@ docker run --rm --env RADIUS=<RadiusInKm> --env LATITUDE=<Breitengrad> --env LON
 ```
 
 
-**5. Ausführen der Datenbereinigung**
+### **5. Ausführen der Datenbereinigung**
 
 Docker-Image erstellen: 
 
@@ -79,20 +79,38 @@ docker run --rm --env AZURE_CONNECTION_STRING=<AzureConnectionString> --env RAW_
 ```
 
 
-**6. Prüfen der Ergebnisse**
+### **6. Prüfen der Ergebnisse**
 
 Anzahl der Datensätze: 
 ```
-SELECT COUNT(*) FROM <table>.
+SELECT COUNT(*) FROM cleaneddata.
 ```
 
 Teuerster Spritpreis inkl. Marke, Ort und Zeit für E5 für die gesamte Aufzeichnungszeit: 
 ```
-SELECT brand, place, time, MAX(e5) FROM <table>.
+SELECT brand, place, time, MAX(e5) FROM cleaneddata.
 ```
 
 Niedrigster Spritpreis inkl. Marke, Ort und Zeit für E10 für den 21.12.2025: 
 ```
-SELECT brand, place, time, MIN(e10) FROM <table> where time = '21.12.2025'.
+SELECT brand, place, time, MIN(e10) FROM cleaneddata WHERE time = '21.12.2025'.
 ```
+
+---
+
+## Wartbarkeit, Skalierbarkeit und Verlässlichkeit
+
+- In diesem Git-Repository liegt der gesamte Programmcode versioniert vor
+- Funktionsweise und Anwendungshinweise sind hier übersichtlich aufgeführt und dokumentiert
+- Durch Docker kann mittels Containerisierung eine gleiche Laufzeitumgebung auf jeder Plattform geschaffen werden
+- Mehrere Docker-Images können parallel betrieben werden, um die dichte der Datenabfrage zu optimieren
+
+## Datensicherheit, -schutz und Governance 
+
+- Clouddienste über Azure liegen hinter einem IAM auf Basis von Microsoft AD
+- Nur Berechtigte User haben Zugriff auf die Infrastruktur 
+- API-Keys sind rollierend und nicht öffnetlich einsehbar
+- Azure Storage Blobs sind nicht öffentlich zugänglich
+- Daten sind in den Cloud Services verschlüsselt
+- Up- und Download der Daten erfolgt über eine verschlüsselte Verbindung 
 
