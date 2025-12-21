@@ -24,13 +24,13 @@ Die Architektur basiert dabei aus Python-Skripten als auch Cloud-Services von Mi
 
 **1. Repository herunterladen**
 
-`git clone <REPO_URL>
-cd DLMDWWDE02`
+`git clone https://github.com/m0rifz/DLMDWWDE02.git DLMDWWDE02`
 
 **2. Umgebung aufbauen**
 
-Bei Ausführung mittels Docker werden alle benötigten Komponenten beim Imagebau automatisch durch die mitgelieferte `requirements.txt` bereitgestellt und installiert.
-Bei lokaler Ausführung müssen die einzelenn Komponenten, welche in den Dateien `requirements.txt` der jeweiligen Schritte liegen, manuell installiert werden.
+Bei **Ausführung mittels Docker** werden alle benötigten Komponenten beim Imagebau automatisch durch die mitgelieferte `requirements.txt` bereitgestellt und installiert.
+
+Bei **lokaler Ausführung** müssen die einzelenn Komponenten, welche in den Dateien `requirements.txt` der jeweiligen Schritte liegen, manuell installiert werden.
 
 **3. Bereitlegen der Umgebungsparametern**
 
@@ -53,7 +53,9 @@ Zum Ausführen der `Cleaner.py` sind folgende Umgebungsparameter zu übergeben:
 
 Docker-Image erstellen: 
 
-`docker build -t dockerfile/collector .`
+```
+docker build -t dockerfile/collector .
+```
 
 Dockerimage ausführen:
 
@@ -66,7 +68,9 @@ docker run --rm --env RADIUS=<RadiusInKm> --env LATITUDE=<Breitengrad> --env LON
 
 Docker-Image erstellen: 
 
-`docker build -t dockerfile/cleaner .`
+```
+docker build -t dockerfile/cleaner .
+```
 
 Dockerimage ausführen: 
 
@@ -76,3 +80,19 @@ docker run --rm --env AZURE_CONNECTION_STRING=<AzureConnectionString> --env RAW_
 
 
 **6. Prüfen der Ergebnisse**
+
+Anzahl der Datensätze: 
+```
+SELECT COUNT(*) FROM <table>.
+```
+
+Teuerster Spritpreis inkl. Marke, Ort und Zeit für E5 für die gesamte Aufzeichnungszeit: 
+```
+SELECT brand, place, time, MAX(e5) FROM <table>.
+```
+
+Niedrigster Spritpreis inkl. Marke, Ort und Zeit für E10 für den 21.12.2025: 
+```
+SELECT brand, place, time, MIN(e10) FROM <table> where time = '21.12.2025'.
+```
+
