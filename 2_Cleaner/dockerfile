@@ -1,0 +1,19 @@
+# Basis-Image
+FROM python:3.13
+
+# Arbeitsverzeichnis
+WORKDIR /app
+
+# Projektdateien in den Container kopieren
+COPY . .
+
+# Requirements sicherstellen 
+RUN pip install --upgrade pip \
+    && pip install -r requirements.txt
+
+# Verzeichnisse anlegen 
+RUN mkdir -p /app/Daten
+RUN mkdir -p /app/Bereinigte_Daten
+
+# Standardbefehl: lokale Pipeline starten
+CMD ["python", "Cleaner.py"]
