@@ -9,7 +9,7 @@ Die Architektur basiert dabei aus Python-Skripten als auch Cloud-Services von Mi
 **Ablauf der Batchverarbeitung:**
 1. CSV-Dateien durch Abfragen und Sammeln von Tankstellenpreisen (`Collector.py`) inkl. Upload der Dateien nach Microsoft Azure in Storage Blobs
 2. Transformation der Daten durch ein weiteres Python-Skript (`Cleaner.py`) inkl. Down- und Upload aus bestehendem Azure Storage Blob in neues Storage Blob
-3. Überleitung der bereinigten CSV-Dateien in SQL-Pool mittels Azure Synapse Analytics
+3. Überleitung und Abfrage der bereinigten CSV-Dateien in eine SQL-Datenbank mittels Azure Synapse Analytics
 
 **Verwendete Komponenten:**
 - Python 3.12 (Numpy 2.3.5 + Pandas 2.3.3 + Azure-Storage-Blob 12.27.1 + Requests 2.32.5)
