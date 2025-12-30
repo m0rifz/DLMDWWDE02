@@ -113,6 +113,7 @@ df = spark.sql("SELECT AVG(diesel) FROM tankstellen.spritpreise")
 display(df)
 ```
 
+Der SQL-Datapool ermöglicht auch die Anbindung als Semantisches Modell in PowerBI und die damit verbundene Visualisierung der Daten.
 ---
 
 ## Wartbarkeit, Skalierbarkeit und Verlässlichkeit
