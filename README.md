@@ -83,23 +83,31 @@ docker run --rm --env AZURE_CONNECTION_STRING=<AzureConnectionString> --env RAW_
 
 Die Datenbereinigung lädt die im Blob gespeicherten Rohdaten herunter und aggregiert diese. Dabei werden diverse Gesichtspunkte behandelt. Unter anderem werden geschlossene Tankstellen von der weiteren Verarbeitung ausgeschlossen, Spritpreise ohne Wert, sogenannte NaN (Not a Number)-Werte, korrigiert und Ausreißer aus der Normalverteilung über den eingelesenen Datensatz geglättet. Anschließend wird eine CSV-Datei mit den bereinigten Datensätzen in einen Blob, welcher die bereinigte Datensätze enthält, hochgeladen. 
 
-### **6. Prüfen der Ergebnisse**
+### **6. Tiefgreifende Datenanalyse mit Apache Spark**
 
-Die CSV-Dateien werden in Intervallen in Azure Synapse Analytics und die damit verbundene SQL-Datenbank eingelesen. Neue Datensätze werden dabei der entsprechenden Datenbanktabelle angehangen. Anschließend kann die Datenbank abgefragt werden. Mögliche Anfragen werden folgend vorgestellt.
+Die CSV-Dateien werden in Intervallen in Azure Synapse Analytics und den damit verbundenen SQL-Datapool eingelesen. Die geladenen Daten befinden sich dabei in einer Apache-Spark-Instanz und können hieraus, auch bei sehr großen Datenmengen, effizient verarbeitet werden. 
+```
+spark.sql("CREATE DATABASE IF NOT EXISTS tankstellen")
+df.write.mode("append").saveAsTable("tankstellen.spritpreise")
+```
+Durch die Möglichkeit der Parallelisierung und des Cachings werden neue Möglichkeiten eröffnet, um kurze Verarbeitungszeiten zu ermöglichen. Auf Basis dieser Infrasturktur können nahtlos Themen, wie Maschine Learning, Data Analytics und Data Science, integriert werden. Um den Datenbestand nach dem Laden in die Instanz zu prüfen, können bspw. folgenden Abfragen ausgeführt werden:
 
 Anzahl der Datensätze: 
 ```
-SELECT COUNT(*) FROM cleaneddata.
+count = spark.sql("SELECT COUNT(*) FROM tankstellen.spritpreise")
+display(count)
 ```
 
-Teuerster Spritpreis inkl. Marke, Ort und Zeit für E5 für die gesamte Aufzeichnungszeit: 
+Teuerster Spritpreis für E5 für die gesamte Aufzeichnungszeit: 
 ```
-SELECT brand, place, time, MAX(e5) FROM cleaneddata.
+df = spark.sql("SELECT MAX(e5) FROM tankstellen.spritpreise") 
+display(df)
 ```
 
-Niedrigster Spritpreis inkl. Marke, Ort und Zeit für E10 für den 21.12.2025: 
+Durchschnittlicher Spritpreis für Diesel für die gesamte Aufzeichnungszeit:
 ```
-SELECT brand, place, time, MIN(e10) FROM cleaneddata WHERE time = '21.12.2025'.
+df = spark.sql("SELECT AVG(diesel) FROM tankstellen.spritpreise") 
+display(df)
 ```
 
 ---
