@@ -83,10 +83,13 @@ docker run --rm --env AZURE_CONNECTION_STRING=<AzureConnectionString> --env RAW_
 
 Die Datenbereinigung lädt die im Blob gespeicherten Rohdaten herunter und aggregiert diese. Dabei werden diverse Gesichtspunkte behandelt. Unter anderem werden geschlossene Tankstellen von der weiteren Verarbeitung ausgeschlossen, Spritpreise ohne Wert, sogenannte NaN (Not a Number)-Werte, korrigiert und Ausreißer aus der Normalverteilung über den eingelesenen Datensatz geglättet. Anschließend wird eine CSV-Datei mit den bereinigten Datensätzen in einen Blob, welcher die bereinigte Datensätze enthält, hochgeladen. 
 
-### **6. Tiefgreifende Datenanalyse mit Apache Spark**
+### **6. Tiefgreifende Datenanalyse mit Apache Spark als Big-Data-Technologie**
 
 Die CSV-Dateien werden in Intervallen in Azure Synapse Analytics und den damit verbundenen SQL-Datapool eingelesen. Die geladenen Daten befinden sich dabei in einer Apache-Spark-Instanz und können hieraus, auch bei sehr großen Datenmengen, effizient verarbeitet werden. 
 ```
+spark.conf.set("fs.azure.account.key.<BlobContainer>.blob.core.windows.net", "<ConnectionString>");
+df = spark.read.format("csv").option("header",True).option("inferSchema",True).load("wasbs://<Container>@<Storage>.blob.core.windows.net/");
+df.cache()
 spark.sql("CREATE DATABASE IF NOT EXISTS tankstellen")
 df.write.mode("append").saveAsTable("tankstellen.spritpreise")
 ```
