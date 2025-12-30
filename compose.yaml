@@ -1,0 +1,38 @@
+services: 
+# Standort Hamburg
+  collector1:
+    build: 1_Collector
+    environment: 
+      TANKER_API_KEY: <TANKER_API_KEY>
+      AZURE_CONNECTION_STRING: <AZURE_CONNECTION_STRING>
+      RADIUS: 50 
+      LATITUDE: 53.33 
+      LONGITUDE: 10 
+      HAEUFIGKEIT: 240 
+      ANZAHL: 10
+      CONTAINER: <CONTAINER>
+
+# Standort Leipzig
+  collector2:
+    build: 1_Collector
+    environment: 
+      TANKER_API_KEY: <TANKER_API_KEY>
+      AZURE_CONNECTION_STRING: <AZURE_CONNECTION_STRING>
+      RADIUS: 50 
+      LATITUDE: 51.20
+      LONGITUDE: 12.22 
+      HAEUFIGKEIT: 240 
+      ANZAHL: 10
+      CONTAINER: <CONTAINER>
+
+  cleaner: 
+    build: 2_Cleaner
+    environment: 
+      AZURE_CONNECTION_STRING: <AZURE_CONNECTION_STRING>
+      RAW_CONTAINER: <RAW_CONTAINER>
+      CLEANED_CONTAINER: <CLEANED_CONTAINER>
+    depends_on:
+      collector1:
+        condition: service_completed_successfully
+      collector2:
+        condition: service_completed_successfully
