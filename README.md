@@ -15,7 +15,7 @@ Die Architektur basiert dabei aus Python-Skripten als auch Cloud-Services von Mi
 - Python 3.12 (Numpy 2.3.5 + Pandas 2.3.3 + Azure-Storage-Blob 12.27.1 + Requests 2.32.5)
 - Azure Storage (flacher Dateispeicher mit Blobs)
 - Azure Synapse Analytics (Analysedienst inkl. SQL-Warehousing)
-- Docker zur Containerisierung und Reproduzierbarkeit
+- Docker zur Containerisierung und Reproduzierbarkeit inkl. Docker Compose zur Orchestrierung 
 - Azure Verschlüsselung und MS IAM zur Datensicherheit
 
 ---
