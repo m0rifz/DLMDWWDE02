@@ -44,7 +44,6 @@ def ausbrecher_corr(daten, art, low_lim, up_lim):
 
 def data_cleaner():
     files = glob.glob('Daten/*.csv')
-    print(files)
     datafiles = [pandas.read_csv(f, sep=',', decimal='.') for f in files]
     rawdata = pandas.concat(datafiles, ignore_index=True) 
     rawdata = rawdata.drop(rawdata[rawdata['id'] == 'id'].index)
@@ -116,7 +115,7 @@ def upload_refineddata():
                 file_path_on_local = os.path.join(root,file)
                 blob_client = blob_service_up_client.get_blob_client(container=cleaned_container_name, blob=file)
                 with open(file_path_on_local, 'rb') as data:
-                    blob_client.upload_blob(data)
+                    blob_client.upload_blob(data, overwrite=True)
                     print(f'Datei hochgeladen: {file}')
                     count += 1
 
@@ -147,6 +146,7 @@ def download_rawdata():
         with open(download_path, "ab") as download_file:
             download_stream = blob_client.download_blob()
             download_file.write(download_stream.readall()) 
+        blob_client.delete_blob(delete_snapshots="include")
     print(f"Raw-Download beendet.")
 
 
