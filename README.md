@@ -9,12 +9,13 @@ Die Architektur basiert dabei aus Python-Skripten als auch Cloud-Services von Mi
 **Ablauf der Batchverarbeitung:**
 1. Erstellen von CSV-Dateien durch Abfragen und Sammeln von Tankstellenpreisen (`Collector.py`) inkl. Upload der Dateien nach Microsoft Azure in einen Storage Blob
 2. Transformation der Daten durch ein weiteres Python-Skript (`Cleaner.py`) inkl. Down- und Upload aus einem bestehenden Azure Storage Blob in ein neues Storage Blob
-3. Überleitung und Abfrage der bereinigten CSV-Dateien in eine SQL-Datenbank mittels Azure Synapse Analytics mit anschließender Auswertung
+3. Überleitung und Prozessierung der bereinigten CSV-Dateien in einen Apache Spark SQL-Pool mittels Azure Synapse Analytics mit anschließender Auswertung
 
 **Verwendete Komponenten:**
 - Python 3.12 (Numpy 2.3.5 + Pandas 2.3.3 + Azure-Storage-Blob 12.27.1 + Requests 2.32.5)
 - Azure Storage (flacher Dateispeicher mit Blobs)
 - Azure Synapse Analytics (Analysedienst inkl. SQL-Warehousing)
+- Apache Spark
 - Docker zur Containerisierung und Reproduzierbarkeit inkl. Docker Compose zur Orchestrierung 
 - Azure Verschlüsselung und MS IAM zur Datensicherheit
 
@@ -26,11 +27,13 @@ Die Architektur basiert dabei aus Python-Skripten als auch Cloud-Services von Mi
 
 `git clone https://github.com/m0rifz/DLMDWWDE02.git DLMDWWDE02`
 
+
 ### **2. Umgebung aufbauen**
 
 Bei **Ausführung mittels Docker** werden alle benötigten Komponenten beim Imagebau automatisch durch die mitgelieferte `requirements.txt` bereitgestellt und installiert.
 
 Bei **lokaler Ausführung** müssen die einzelnen Komponenten, welche in den Dateien `requirements.txt` der jeweiligen Schritte liegen, manuell installiert werden.
+
 
 ### **3. Bereitlegen der Umgebungsparameter**
 
@@ -49,7 +52,8 @@ Zum Ausführen der `Cleaner.py` sind folgende Umgebungsparameter zu übergeben:
 - Azure Storage Blob Containername mit Rohdaten (`RAW_CONTAINER`)
 - Azure Storage Blob Containername für bereinigte Daten (`CLEANED_CONTAINER`)
 
-### **4. Ausführen der Datensammlung**
+
+### **4. Gekapselte Ausführen der Datensammlung**
 
 Docker-Image erstellen: 
 
@@ -66,7 +70,8 @@ docker run --rm --env RADIUS=<RadiusInKm> --env LATITUDE=<Breitengrad> --env LON
 
 Der Datensammler kann mehrmals durch die Containerisierung parallel gestartet und laufen gelassen werden mit jeweils unterschiedlichen Koordinaten, um die Menge an abgefragten Tankstellen zu erhöhen. Der Radius der abgefragten Tankstellen-API ist limitiert, sodass ein groß gewählter Radius beschnitten werden würde. 
 
-### **5. Ausführen der Datenbereinigung**
+
+### **5. Gekapselte Ausführen der Datenbereinigung**
 
 Docker-Image erstellen: 
 
@@ -83,7 +88,19 @@ docker run --rm --env AZURE_CONNECTION_STRING=<AzureConnectionString> --env RAW_
 
 Die Datenbereinigung lädt die im Blob gespeicherten Rohdaten herunter und aggregiert diese. Dabei werden diverse Gesichtspunkte behandelt. Unter anderem werden geschlossene Tankstellen von der weiteren Verarbeitung ausgeschlossen, Spritpreise ohne Wert, sogenannte NaN (Not a Number)-Werte, korrigiert und Ausreißer aus der Normalverteilung über den eingelesenen Datensatz geglättet. Anschließend wird eine CSV-Datei mit den bereinigten Datensätzen in einen Blob, welcher die bereinigte Datensätze enthält, hochgeladen. 
 
-### **6. Tiefgreifende Datenanalyse mit Apache Spark als Big-Data-Technologie**
+
+### **6. Orchestrierte Ausführung von Punkt 4 und 5 mittels Docker Compose:**
+
+Zur orchestrierten Ausführung kann Docker Compose verwendet werden. Sollte dies der Fall sein, können die Punkte 4 und 5 übersprungen werden. Alle Parameter und Services sind hierzu in der `compose.yaml` zu konfigurieren, sodass Docker Compose auf Basis dieser ausgeführt werden kann. Die `compose.yaml` in diesem Repo enthält beispielhaft zwei Instanzen des Collectors, zum einen mit dem Standort Hamburg zum anderen mit dem Standort Leipzig. Nach Abschluss des Sammelns der Daten wird eine Instanz zur Bereinigung der Daten gestartet. 
+
+Docker Compose ausführen: 
+
+```
+docker compose up
+```
+
+
+### **7. Tiefgreifende Datenanalyse mit Apache Spark als Big-Data-Technologie**
 
 Die CSV-Dateien werden in Intervallen in Azure Synapse Analytics und den damit verbundenen SQL-Datapool eingelesen. Die geladenen Daten befinden sich dabei in einer Apache-Spark-Instanz und können hieraus, auch bei sehr großen Datenmengen, effizient verarbeitet werden. 
 ```
@@ -114,6 +131,8 @@ display(df)
 ```
 
 Der SQL-Datapool ermöglicht auch die Anbindung als Semantisches Modell in PowerBI und die damit verbundene Visualisierung der Daten.
+
+
 ---
 
 ## Wartbarkeit, Skalierbarkeit und Verlässlichkeit
