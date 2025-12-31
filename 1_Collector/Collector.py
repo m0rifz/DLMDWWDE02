@@ -113,9 +113,13 @@ def upload_rawdata():
                 file_path_on_local = os.path.join(root,file)
                 blob_client = blob_service_client.get_blob_client(container=container_name, blob=file_path_on_azure)
                 with open(file_path_on_local, 'rb') as data:
-                    blob_client.upload_blob(data)
-                    print(f'Datei hochgeladen: {file}')
-                    count += 1
+                    try:
+                        blob_client.upload_blob(data)
+                        print(f'Datei hochgeladen: {file}')
+                        count += 1
+                    except Exception as e:
+                        print(f'Fehler im Dateiupload: {file}')
+                        print(e.message)
 
     print(f'Verarbeitung abgeschlossen. {count} Dateien hochgeladen.')
 
