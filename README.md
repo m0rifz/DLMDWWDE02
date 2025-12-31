@@ -139,6 +139,7 @@ Der SQL-Datapool ermöglicht auch die Anbindung als Semantisches Modell in Power
 
 - In diesem Git-Repository liegt der gesamte Programmcode versioniert vor
 - Funktionsweise und Anwendungshinweise sind hier übersichtlich aufgeführt und dokumentiert
+- Fehler werden durch Logging mitgeschrieben und sind auf diese Weise verständlicher 
 - Durch Docker kann mittels Containerisierung eine gleiche Laufzeitumgebung auf jeder Plattform geschaffen werden
 - Mehrere Docker-Images können parallel betrieben werden, um die dichte der Datenabfrage zu optimieren
 
